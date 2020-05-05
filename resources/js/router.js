@@ -14,6 +14,7 @@ import Division from './views/Division'
 import Department from './views/Department'
 import Employee from './views/Employee'
 import Supplier from './views/Supplier'
+import ManageEquipment from './views/ManageEquipment'
 
 const routes = [
     {
@@ -76,6 +77,12 @@ const routes = [
         component: Supplier,
         props: {title: "Supplier View"},
     },
+    {
+        path: '/manage-equipment',
+        component: ManageEquipment,
+        props: {title: "Manage Equipment View"}
+    },
+    
 ]
 
 export default new VueRouter({

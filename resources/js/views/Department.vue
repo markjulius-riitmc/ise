@@ -45,9 +45,9 @@
             </v-card-text>
 
             <v-pagination
-            v-model="pagination.current_page"
-            :length="pagination.total"
-            @input="changePage"
+                v-model="pagination.current_page"
+                :length="pagination.total"
+                @input="changePage"
             ></v-pagination>
             
             <v-card

@@ -30,6 +30,7 @@
         "vue-select": "^3.10.0",
         "vuelidate": "^0.7.5",
         "vuetify": "^2.2.20",
+        "vuetify-image-input": "^19.1.0",
         "vuetify-loader": "^1.4.3"
     }
 }

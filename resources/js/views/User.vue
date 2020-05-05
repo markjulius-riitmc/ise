@@ -1,6 +1,6 @@
 <template>
     <div>
-              <v-card>
+      <v-card>
             <v-system-bar></v-system-bar>
             <v-toolbar flat>
                 <v-toolbar-title>{{ title }}</v-toolbar-title>

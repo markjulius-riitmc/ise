@@ -205,7 +205,6 @@
                     current_page: meta.current_page,
                     total: this.makeAbsNumber(meta.total/meta.per_page),
                 }
-
                 this.pagination = pagination
             },
             makeAbsNumber(num) {

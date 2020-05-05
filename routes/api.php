@@ -66,10 +66,15 @@ Route::post('/employee', 'EmployeeController@store');
 Route::put('/employee', 'EmployeeController@store');
 Route::delete('/employee/{id}', 'EmployeeController@destroy');
 
-
 // SUPPLIERS
 Route::get('/suppliers', 'SupplierController@index');
 Route::post('/supplier', 'SupplierController@store');
 Route::put('/supplier', 'SupplierController@store');
 Route::delete('/supplier/{id}', 'SupplierController@destroy');
+
+// MANAGE EQUIPMENT
+Route::get('/manage-equipments', 'ManageEquipmentController@index');
+Route::post('/manage-equipment', 'ManageEquipmentController@store');
+Route::put('/manage-equipment', 'ManageEquipmentController@store');
+Route::delete('/manage-equipment/{id}', 'ManageEquipmentController@destroy');
 

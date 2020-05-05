@@ -7,7 +7,7 @@
       <!-- CSRF Token -->
       <meta name="csrf-token" content="{{ csrf_token() }}">
 
-      <title>R2TMC Spa</title>
+      <title>R2TMC PARE</title>
 
       <!-- Fonts -->
       <!-- <link rel="dns-prefetch" href="//fonts.gstatic.com">

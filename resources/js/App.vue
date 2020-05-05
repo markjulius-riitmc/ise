@@ -79,10 +79,19 @@
 
         <v-list-item to="/supplier" link>
           <v-list-item-action>
-            <v-icon>mdi-package-variant-closed</v-icon>
+            <v-icon>mdi-semantic-web</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Suppliers</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item to="/manage-equipment" link>
+          <v-list-item-action>
+            <v-icon>mdi-calendar-text</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Manage Equipment</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         
@@ -134,6 +143,16 @@
     },
     data: () => ({
       drawer: null,
+      admins: [
+        ['Management', 'people_outline'],
+        ['Settings', 'settings'],
+      ],
+      cruds: [
+        ['Create', 'add'],
+        ['Read', 'insert_drive_file'],
+        ['Update', 'update'],
+        ['Delete', 'delete'],
+      ],
     }),
   }
 </script>
