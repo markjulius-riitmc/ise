@@ -190,14 +190,12 @@ class ManageEquipmentController extends Controller
      * @param  \App\ManageEquipment  $manageEquipment
      * @return \Illuminate\Http\Response
      */
-    public function destroy($manageEquipment)
+    public function destroy(ManageEquipment $manageEquipment)
     {
-        // Get manage equipment
-        // $equipment = ManageEquipment::findOrFail($id);
-
         // Perform delete
         if ($manageEquipment->delete()) {
-            return new ManageEquipmentResource($equipment);
+            // return new ManageEquipmentResource($equipment);
+            return response(['success' => 'Property Acknowledgment Receipt removed'], Response::HTTP_ACCEPTED);
         }
 
     }

@@ -4122,6 +4122,8 @@ __webpack_require__.r(__webpack_exports__);
     deleteManageEquipment: function deleteManageEquipment(id) {
       var _this10 = this;
 
+      console.log(id);
+
       if (confirm('Are you sure?')) {
         fetch("/api/manage-equipment/".concat(id), {
           method: 'delete'

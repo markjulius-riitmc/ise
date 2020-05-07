@@ -589,6 +589,8 @@
                 // console.log(this.item_lists);
             },
             deleteManageEquipment(id) {
+                console.log(id);
+                
                 if (confirm('Are you sure?')) {
                     fetch(`/api/manage-equipment/${id}`, {
                         method: 'delete'
