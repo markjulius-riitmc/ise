@@ -73,8 +73,9 @@ Route::put('/supplier', 'SupplierController@store');
 Route::delete('/supplier/{id}', 'SupplierController@destroy');
 
 // MANAGE EQUIPMENT
-Route::get('/manage-equipments', 'ManageEquipmentController@index');
-Route::post('/manage-equipment', 'ManageEquipmentController@store');
-Route::put('/manage-equipment', 'ManageEquipmentController@store');
-Route::delete('/manage-equipment/{id}', 'ManageEquipmentController@destroy');
+// Route::get('/manage-equipment', 'ManageEquipmentController@index');
+// Route::post('/manage-equipment', 'ManageEquipmentController@store');
+// Route::put('/manage-equipment', 'ManageEquipmentController@store');
+// Route::delete('/manage-equipment/{id}', 'ManageEquipmentController@destroy');
+Route::apiResource('manage-equipment', 'ManageEquipmentController');
 

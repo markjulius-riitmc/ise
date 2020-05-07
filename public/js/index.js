@@ -3744,6 +3744,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -3792,7 +3793,8 @@ __webpack_require__.r(__webpack_exports__);
       division: '',
       department: '',
       employee: '',
-      manage_equipment: {
+      fileInput: '',
+      equipment: {
         id: '',
         par_no: '',
         description: '',
@@ -3800,9 +3802,10 @@ __webpack_require__.r(__webpack_exports__);
         division: '',
         department: '',
         employee: '',
-        file_paths: []
+        file_paths: [],
+        item_lists: []
       },
-      manage_equipments: [],
+      manage_equipment: [],
       sites: [],
       divisions: [],
       departments: [],
@@ -3813,7 +3816,7 @@ __webpack_require__.r(__webpack_exports__);
       file_paths: [],
       headers: [{
         text: 'ID',
-        value: 'ids',
+        value: 'id',
         visible: false
       }, {
         text: 'Property No.',
@@ -3844,7 +3847,7 @@ __webpack_require__.r(__webpack_exports__);
         sortable: false
       }],
       editedItem: {
-        ids: '',
+        id: '',
         property_no: '',
         equipment: '',
         sku: '',
@@ -3854,7 +3857,7 @@ __webpack_require__.r(__webpack_exports__);
         supplier: ''
       },
       defaultItem: {
-        ids: '',
+        id: '',
         property_no: '',
         equipment: '',
         sku: '',
@@ -3934,19 +3937,19 @@ __webpack_require__.r(__webpack_exports__);
         return console.log(err);
       });
     },
-    fetchManageEquipments: function fetchManageEquipments(page) {
+    fetchManageEquipment: function fetchManageEquipment(page) {
       var _this7 = this;
 
-      var url = "/api/manage-equipments?page=".concat(page);
+      var url = "/api/manage-equipment?page=".concat(page);
       fetch(url).then(function (res) {
         return res.json();
       }).then(function (res) {
-        _this7.manage_equipments = res.data;
+        _this7.manage_equipment = res.data;
         _this7.meta = res.meta;
 
         _this7.makePagination(res.meta, res.links);
       })["catch"](function (err) {
-        return console.log(err);
+        return console.log(err.data);
       });
     },
     makePagination: function makePagination(meta, links) {
@@ -3969,7 +3972,7 @@ __webpack_require__.r(__webpack_exports__);
       return num;
     },
     changePage: function changePage(page) {
-      this.fetchManageEquipments(page);
+      this.fetchManageEquipment(page);
     },
     submit: function submit() {
       var _this8 = this;
@@ -3991,43 +3994,60 @@ __webpack_require__.r(__webpack_exports__);
         this.form.append('division', this.division);
         this.form.append('department', this.department);
         this.form.append('employee', this.employee);
-        this.form.append('item_lists', JSON.stringify(this.item_lists)); // console.log(this.item_lists);
-        // for (let i = 0; i < this.item_lists.length; i++) {
-        //     this.form.append('item_lists[]', this.item_lists[i])
-        // }
+        this.form.append('item_lists', JSON.stringify(this.item_lists));
 
         for (var i = 0; i < this.file_paths.length; i++) {
           this.form.append('file_paths[]', this.file_paths[i]);
         }
 
         if (this.edit == false) {
+          // Add
           axios.post('/api/manage-equipment', this.form, config).then(function (response) {
-            alert('Property Acknowledgment Receipt added');
+            alert(response.data.success);
 
             _this8.clear();
 
-            _this8.fetchManageEquipments(); // console.log(response);
-
+            _this8.fetchManageEquipment();
           })["catch"](function (err) {
             return console.log(err);
           });
         } else {
-          // Update
-          fetch('/api/manage-equipment', {
-            method: 'put',
-            body: JSON.stringify(manage_equipment),
-            headers: {
-              'content-type': 'application/json'
-            }
-          }).then(function (res) {
-            return res.json();
-          }).then(function (data) {
-            alert('Property Acknowledgment Receipt updated');
+          var equipment = {
+            'id': this.id,
+            'par_no': this.par_no,
+            'description': this.description,
+            'site': this.site,
+            'division': this.division,
+            'department': this.department,
+            'employee': this.employee,
+            'item_lists': this.item_lists,
+            'file_paths': this.file_paths
+          }; // Update
+
+          axios.patch('/api/manage-equipment/' + this.id, equipment).then(function (response) {
+            console.log(response);
+            alert(response.data.success);
 
             _this8.clear();
 
-            _this8.fetchManageEquipments();
-          });
+            _this8.fetchManageEquipment();
+          })["catch"](function (err) {
+            return console.log(err);
+          }); // fetch('/api/manage-equipment/'+this.id, {
+          //     method: 'patch',
+          //     body: this.form,
+          //     headers: {
+          //         // 'content-type': 'application/json'
+          //         'Content-Type': 'multipart/form-data; boundary=something'
+          //         //  'Content-Type': 'application/x-www-form-urlencoded' 
+          //     },
+          // })
+          // .then(res => res.json())
+          // .then(data => {
+          //     alert('Property Acknowledgment Receipt updated')
+          //     this.clear()
+          //     this.fetchManageEquipment()
+          // })
         }
 
         this.submitStatus = 'PENDING';
@@ -4044,7 +4064,7 @@ __webpack_require__.r(__webpack_exports__);
       this.fetchEmployees();
       this.fetchSuppliers();
       this.fetchEquipments();
-      this.fetchManageEquipments();
+      this.fetchManageEquipment();
     },
     clear: function clear() {
       this.$v.$reset();
@@ -4054,18 +4074,9 @@ __webpack_require__.r(__webpack_exports__);
       this.site = '';
       this.division = '';
       this.department = '';
-      this.employee = '';
-      this.editedItem = {
-        ids: '',
-        property_no: '',
-        equipment: '',
-        sku: '',
-        serial_no: '',
-        brand: '',
-        model_no: '',
-        supplier: '',
-        image_path: ''
-      };
+      this.employee = ''; // this.$refs.fileInput.value = ''
+
+      this.item_lists = [];
     },
     editItem: function editItem(item) {
       this.editedIndex = this.item_lists.indexOf(item);
@@ -4086,19 +4097,11 @@ __webpack_require__.r(__webpack_exports__);
       }, 300);
     },
     save: function save() {
-      // let selectedFiles = event
-      // if (!selectedFiles.length) {
-      //     return false
-      // }
-      // for (let i = 0; i < selectedFiles.length; i++) {
-      //     this.file_paths.push(selectedFiles[i])
-      // }
       if (this.editedIndex > -1) {
         Object.assign(this.item_lists[this.editedIndex], this.editedItem);
       } else {
-        this.item_lists.push(this.editedItem); // console.log(this.editedItem);
-      } //  console.log(this.attachment);
-
+        this.item_lists.push(this.editedItem);
+      }
 
       this.close();
     },
@@ -4111,6 +4114,10 @@ __webpack_require__.r(__webpack_exports__);
       this.division = manage_equipment.division_id;
       this.department = manage_equipment.department_id;
       this.employee = manage_equipment.employee_id;
+      this.item_lists = manage_equipment.items;
+      this.file_paths = manage_equipment.attachments; // Assign attachment files to file input
+      // console.log(this.file_paths);
+      // console.log(this.item_lists);
     },
     deleteManageEquipment: function deleteManageEquipment(id) {
       var _this10 = this;
@@ -4123,13 +4130,14 @@ __webpack_require__.r(__webpack_exports__);
         }).then(function (data) {
           alert('Property Acknowledgment Receipt removed');
 
-          _this10.fetchManageEquipments();
+          _this10.fetchManageEquipment();
         })["catch"](function (err) {
           return console.log(err);
         });
       }
     },
     fieldChange: function fieldChange(event) {
+      console.log(event);
       var selectedFiles = event;
 
       if (!selectedFiles.length) {
@@ -44773,6 +44781,7 @@ var render = function() {
                             attrs: {
                               headers: _vm.headers,
                               items: _vm.item_lists,
+                              "item-key": _vm.item_lists.id,
                               "sort-by": "property_no"
                             },
                             scopedSlots: _vm._u([
@@ -45305,11 +45314,11 @@ var render = function() {
             }
           }),
           _vm._v(" "),
-          _vm._l(_vm.manage_equipments, function(manage_equipment) {
+          _vm._l(_vm.manage_equipment, function(equipment) {
             return _c(
               "v-card",
               {
-                key: manage_equipment.id,
+                key: equipment.id,
                 staticClass: "mx-auto mb-2",
                 attrs: { outlined: "" }
               },
@@ -45328,11 +45337,11 @@ var render = function() {
                         _c(
                           "v-list-item-title",
                           { staticClass: "headline mb-1" },
-                          [_vm._v(_vm._s(manage_equipment.par_no))]
+                          [_vm._v(_vm._s(equipment.par_no))]
                         ),
                         _vm._v(" "),
                         _c("v-list-item-subtitle", [
-                          _vm._v(_vm._s(manage_equipment.description))
+                          _vm._v(_vm._s(equipment.description))
                         ])
                       ],
                       1
@@ -45354,7 +45363,7 @@ var render = function() {
                         attrs: { text: "" },
                         on: {
                           click: function($event) {
-                            return _vm.editManageEquipment(manage_equipment)
+                            return _vm.editManageEquipment(equipment)
                           }
                         }
                       },
@@ -45367,9 +45376,7 @@ var render = function() {
                         attrs: { text: "" },
                         on: {
                           click: function($event) {
-                            return _vm.deleteManageEquipment(
-                              manage_equipment.id
-                            )
+                            return _vm.deleteManageEquipment(equipment.id)
                           }
                         }
                       },

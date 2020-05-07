@@ -99,8 +99,9 @@
                             <v-data-table
                             :headers="headers"
                             :items="item_lists"
-                            sort-by="property_no"
+                            :item-key="item_lists.id"
                             class="elevation-1"
+                            sort-by="property_no"
                             >
                                 <template v-slot:top>
                                     <v-toolbar flat color="white">
@@ -232,14 +233,14 @@
             <v-card
                 class="mx-auto mb-2"
                 outlined
-                v-for="manage_equipment in manage_equipments"
-                :key="manage_equipment.id"
+                v-for="equipment in manage_equipment"
+                :key="equipment.id"
             >
                 <v-list-item three-line>
                     <v-list-item-content>
                         <div class="overline mb-4">OVERLINE</div>
-                        <v-list-item-title class="headline mb-1">{{ manage_equipment.par_no }}</v-list-item-title>
-                        <v-list-item-subtitle>{{ manage_equipment.description }}</v-list-item-subtitle>
+                        <v-list-item-title class="headline mb-1">{{ equipment.par_no }}</v-list-item-title>
+                        <v-list-item-subtitle>{{ equipment.description }}</v-list-item-subtitle>
                     </v-list-item-content>
 
                     <v-list-item-avatar
@@ -250,8 +251,8 @@
                 </v-list-item>
 
                 <v-card-actions>
-                    <v-btn text @click="editManageEquipment(manage_equipment)">Edit</v-btn>
-                    <v-btn text @click="deleteManageEquipment(manage_equipment.id)">Delete</v-btn>
+                    <v-btn text @click="editManageEquipment(equipment)">Edit</v-btn>
+                    <v-btn text @click="deleteManageEquipment(equipment.id)">Delete</v-btn>
                 </v-card-actions>
              </v-card>
         </v-card> 
@@ -303,7 +304,8 @@
                 division: '',
                 department: '',
                 employee: '',
-                manage_equipment: {
+                fileInput: '',
+                equipment: {
                     id: '',
                     par_no: '',
                     description: '',
@@ -312,8 +314,9 @@
                     department: '',
                     employee: '',
                     file_paths: [],
+                    item_lists: [],
                 },
-                manage_equipments: [],
+                manage_equipment: [],
                 sites: [],
                 divisions: [],
                 departments: [],
@@ -325,7 +328,7 @@
                 headers: [
                     { 
                         text: 'ID', 
-                        value: 'ids',
+                        value: 'id',
                         visible: false },
                     { text: 'Property No.', value: 'property_no' },
                     {
@@ -342,7 +345,7 @@
                     { text: 'Actions', value: 'actions', sortable: false },
                 ],
                 editedItem: {
-                    ids: '',
+                    id: '',
                     property_no: '',
                     equipment: '',
                     sku: '',
@@ -352,7 +355,7 @@
                     supplier: '',
                 },
                 defaultItem: {
-                    ids: '',
+                    id: '',
                     property_no: '',
                     equipment: '',
                     sku: '',
@@ -415,17 +418,17 @@
                 })
                 .catch(err => console.log(err));
             },
-            fetchManageEquipments(page) {
-                let url = `/api/manage-equipments?page=${page}`
+            fetchManageEquipment(page) {
+                let url = `/api/manage-equipment?page=${page}`
 
                 fetch(url)
                 .then(res => res.json())
                 .then(res => {
-                    this.manage_equipments = res.data
+                    this.manage_equipment = res.data
                     this.meta = res.meta
                     this.makePagination(res.meta, res.links)
                 })
-                .catch(err => console.log(err))
+                .catch(err => console.log(err.data))
             },
             makePagination(meta, links) {
                 let pagination = {
@@ -436,7 +439,6 @@
             },
             makeAbsNumber(num) {
                 var mod = (num % 1)
-
                 if (mod < 0.5 && mod > 0) {
                     num -= mod
                     num += 1
@@ -446,7 +448,7 @@
                 return num
             },
             changePage(page) {
-                this.fetchManageEquipments(page)
+                this.fetchManageEquipment(page)
             },
             submit() {
                 const config = { headers: { 'Content-Type': 'multipart/form-data' } }
@@ -465,42 +467,58 @@
                     this.form.append('employee', this.employee)
                     this.form.append('item_lists', JSON.stringify(this.item_lists))
 
-                    // console.log(this.item_lists);
-                    
-
-                    // for (let i = 0; i < this.item_lists.length; i++) {
-                    //     this.form.append('item_lists[]', this.item_lists[i])
-                    // }
-
                     for (let i = 0; i < this.file_paths.length; i++) {
                         this.form.append('file_paths[]', this.file_paths[i])
                     }
-                
+
                     if (this.edit == false) {
+                        // Add
                         axios.post('/api/manage-equipment', this.form, config)
                         .then(response => {
-                            alert('Property Acknowledgment Receipt added');
+                            alert(response.data.success);
                             this.clear()
-                            this.fetchManageEquipments()
-                            // console.log(response);
+                            this.fetchManageEquipment()
                         })
                         .catch(err => console.log(err))
 
                     } else {
+                        let equipment = {
+                            'id': this.id,
+                            'par_no': this.par_no,
+                            'description': this.description,
+                            'site': this.site,
+                            'division': this.division,
+                            'department': this.department,
+                            'employee': this.employee,
+                            'item_lists': this.item_lists,
+                            'file_paths': this.file_paths,
+                        }
+
                         // Update
-                        fetch('/api/manage-equipment', {
-                            method: 'put',
-                            body: JSON.stringify(manage_equipment),
-                            headers: {
-                                'content-type': 'application/json'
-                            },
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            alert('Property Acknowledgment Receipt updated')
+                        axios.patch('/api/manage-equipment/'+this.id, equipment)
+                        .then(response => {
+                            console.log(response)
+                            alert(response.data.success)
                             this.clear()
-                            this.fetchManageEquipments()
+                            this.fetchManageEquipment()
                         })
+                        .catch(err => console.log(err))
+
+                        // fetch('/api/manage-equipment/'+this.id, {
+                        //     method: 'patch',
+                        //     body: this.form,
+                        //     headers: {
+                        //         // 'content-type': 'application/json'
+                        //         'Content-Type': 'multipart/form-data; boundary=something'
+                        //         //  'Content-Type': 'application/x-www-form-urlencoded' 
+                        //     },
+                        // })
+                        // .then(res => res.json())
+                        // .then(data => {
+                        //     alert('Property Acknowledgment Receipt updated')
+                        //     this.clear()
+                        //     this.fetchManageEquipment()
+                        // })
                     }
                     this.submitStatus = 'PENDING'
                     this.edit = false
@@ -516,7 +534,7 @@
                 this.fetchEmployees()
                 this.fetchSuppliers()
                 this.fetchEquipments()
-                this.fetchManageEquipments()
+                this.fetchManageEquipment()
             },
             clear() {
                 this.$v.$reset()
@@ -527,17 +545,8 @@
                 this.division = ''
                 this.department = ''
                 this.employee = ''
-                this.editedItem = {
-                    ids: '',
-                    property_no: '',
-                    equipment: '',
-                    sku: '',
-                    serial_no: '',
-                    brand: '',
-                    model_no: '',
-                    supplier: '',
-                    image_path: '',
-                }  
+                // this.$refs.fileInput.value = ''
+                this.item_lists = []
             },
             editItem (item) {
                 this.editedIndex = this.item_lists.indexOf(item)
@@ -556,25 +565,11 @@
                 }, 300)
             },
             save () {
-
-                // let selectedFiles = event
-                // if (!selectedFiles.length) {
-                //     return false
-                // }
-
-                // for (let i = 0; i < selectedFiles.length; i++) {
-                //     this.file_paths.push(selectedFiles[i])
-                // }
-
-
-
                 if (this.editedIndex > -1) {
                     Object.assign(this.item_lists[this.editedIndex], this.editedItem) 
                 } else {
                     this.item_lists.push(this.editedItem)
-                    // console.log(this.editedItem);
                 }
-                //  console.log(this.attachment);
                 this.close()
             },
             editManageEquipment(manage_equipment) {
@@ -586,6 +581,12 @@
                 this.division = manage_equipment.division_id
                 this.department = manage_equipment.department_id
                 this.employee = manage_equipment.employee_id
+                this.item_lists = manage_equipment.items
+                this.file_paths = manage_equipment.attachments
+                // Assign attachment files to file input
+
+                // console.log(this.file_paths);
+                // console.log(this.item_lists);
             },
             deleteManageEquipment(id) {
                 if (confirm('Are you sure?')) {
@@ -595,17 +596,18 @@
                     .then(res => res.json())
                     .then(data => {
                         alert('Property Acknowledgment Receipt removed')
-                        this.fetchManageEquipments()
+                        this.fetchManageEquipment()
                     })
                     .catch(err => console.log(err))
                 }
             },
             fieldChange(event) {
+                console.log(event)
                 let selectedFiles = event
+
                 if (!selectedFiles.length) {
                     return false
                 }
-
                 for (let i = 0; i < selectedFiles.length; i++) {
                     this.file_paths.push(selectedFiles[i])
                 }

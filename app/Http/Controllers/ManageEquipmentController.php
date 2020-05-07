@@ -7,6 +7,7 @@ use App\ManageEquipmentItem;
 use App\ManageEquipmentAttachment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\Response;
 use App\Http\Resources\ManageEquipment as ManageEquipmentResource;
 
 class ManageEquipmentController extends Controller
@@ -26,16 +27,6 @@ class ManageEquipmentController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -43,10 +34,12 @@ class ManageEquipmentController extends Controller
      */
     public function store(Request $request)
     {
+        $file_count = count(collect($request->file_paths));
+        $item_count = count(collect($request->item_lists));
+
         // Get manage equipment and method
-        $equipment = $request->isMethod('put') ? ManageEquipment::findOrFail($request->id) : new ManageEquipment;
+        $equipment = new ManageEquipment;
         // Initialize fields
-        $equipment->id = $request->id;
         $equipment->par_no = $request->par_no;
         $equipment->description = $request->description;
         $equipment->site_id = $request->site;
@@ -54,42 +47,31 @@ class ManageEquipmentController extends Controller
         $equipment->department_id = $request->department;
         $equipment->employee_id = $request->employee;
         $equipment->user_id = '1';
-
-        $file_count = count(collect($request->file_paths));
-        $item_count = count(collect($request->item_lists));
-
-        // dd(json_decode($request->item_lists));
         
         // Perform save
         if ($equipment->save()) {
             if ($file_count > 0) {
                 // Loop files
                 foreach ($request->file_paths as $file) {
-                    $filename = Str::lower(
-                        pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
-                        .'-'
-                        .uniqid()
-                        .'.'
-                        .$file->getClientOriginalExtension()
-                    );
-
-                    $filename = $file->hashName();
-
+                    // $filename = Str::lower(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
+                    //     .'-'
+                    //     .$file->hashname()
+                    //     .'.'
+                    //     .$file->getClientOriginalExtension()
+                    // );
                     $file->store('dummy');
-                    $attachment = $request->isMethod('put') ? ManageEquipmentAttachment::findOrFail('') : new ManageEquipmentAttachment;
+                    $attachment = new ManageEquipmentAttachment;
                     $attachment->manage_equipment_id = $equipment->id;
-                    $attachment->file_path = $filename;
+                    $attachment->file_path = $file->hashName();
                     $attachment->save();
                 }
             }
-     
             if ($item_count > 0) {
                 // Loop item lists
                 foreach (json_decode($request->item_lists, true) as $list) {
                     // Get item and method
-                    $item = $request->isMethod('put') ? ManageEquipmentItem::findOrFail('') : new ManageEquipmentItem;
+                    $item = new ManageEquipmentItem;
                     // Initialize fields
-                    // $item->id = $list;
                     $item->manage_equipment_id = $equipment->id;
                     $item->equipment_id = $list['equipment'];
                     $item->property_no = $list['property_no'];
@@ -101,8 +83,8 @@ class ManageEquipmentController extends Controller
                     $item->save();
                 }
             }   
-
-            return new ManageEquipmentResource($equipment);
+            // return new ManageEquipmentResource($equipment);
+            return response(['success' => 'Property Acknowledgment Receipt added'], Response::HTTP_CREATED);
         } 
     }
 
@@ -114,7 +96,8 @@ class ManageEquipmentController extends Controller
      */
     public function show(ManageEquipment $manageEquipment)
     {
-        //
+        // dd($manageEquipment);
+        return new ManageEquipmentResource($manageEquipment);
     }
 
     /**
@@ -137,7 +120,68 @@ class ManageEquipmentController extends Controller
      */
     public function update(Request $request, ManageEquipment $manageEquipment)
     {
-        //
+        // $manageEquipment->update($request->all());
+        $file_count = count(collect($request->file_paths));
+        $item_count = count(collect($request->item_lists));
+
+        // dd($request->file_paths);
+        // dd($request->item_lists);
+
+        // dd($request->site);
+
+        // Assign values
+        $manageEquipment->par_no = $request->par_no;
+        $manageEquipment->description = $request->description;
+        $manageEquipment->site_id = $request->site;
+        $manageEquipment->division_id = $request->division;
+        $manageEquipment->department_id = $request->department;
+        $manageEquipment->employee_id = $request->employee;
+        $manageEquipment->user_id = '1';
+
+        // Perform save
+        if ($manageEquipment->save()) {
+            if ($file_count > 0) {
+                // Loop files
+                foreach ($request->file_paths as $file) {
+                    // $filename = Str::lower(
+                    //     pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
+                    //     .'-'
+                    //     .uniqid()
+                    //     .'.'
+                    //     .$file->getClientOriginalExtension()
+                    // );
+
+                    // $filename = $file->hashName();
+
+                    // $file->store('dummy');
+
+                    $attachment = ManageEquipmentAttachment::findOrFail($file['id']);
+                    $attachment->manage_equipment_id = $manageEquipment->id;
+                    $attachment->file_path = $file['id'];
+                    $attachment->save();
+                }
+            }
+    
+            if ($item_count > 0) {
+                // Loop item lists
+                foreach ($request->item_lists as $list) {
+                    // Get item and method
+                    $item = ManageEquipmentItem::findOrFail($list['id']);
+                    // Initialize fields
+                    $item->manage_equipment_id = $manageEquipment->id;
+                    $item->equipment_id = $list['equipment'];
+                    $item->property_no = $list['property_no'];
+                    $item->brand = $list['brand'];
+                    $item->model_no = $list['model_no'];
+                    $item->serial_no = $list['serial_no'];
+                    $item->sku = $list['sku'];
+                    $item->supplier_id = $list['supplier'];
+                    $item->save();
+                }
+            }   
+        } 
+        return response(['success' => 'Property Acknowledgment Receipt updated'], Response::HTTP_ACCEPTED);
+        // return new ManageEquipmentResource($equipment);
     }
 
     /**
@@ -146,13 +190,13 @@ class ManageEquipmentController extends Controller
      * @param  \App\ManageEquipment  $manageEquipment
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($manageEquipment)
     {
         // Get manage equipment
-        $equipment = ManageEquipment::findOrFail($id);
+        // $equipment = ManageEquipment::findOrFail($id);
 
         // Perform delete
-        if ($equipment->delete()) {
+        if ($manageEquipment->delete()) {
             return new ManageEquipmentResource($equipment);
         }
 
