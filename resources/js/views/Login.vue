@@ -80,9 +80,7 @@
                 if (this.$v.$invalid) {
                     this.submitStatus = 'ERROR'
                 } else {
-                    axios.post('/api/auth/login', credentials)
-                    .then(res => console.log(res.data))
-                    .catch(err => console.log(err.response.data))
+                    User.login(credentials)
                 }
             },
             clear () {
