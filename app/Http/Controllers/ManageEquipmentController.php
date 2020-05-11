@@ -80,6 +80,8 @@ class ManageEquipmentController extends Controller
                     $item->serial_no = $list['serial_no'];
                     $item->sku = $list['sku'];
                     $item->supplier_id = $list['supplier'];
+                    $item->quantity = $list['quantity'];
+                    $item->unit_value = $list['unit_value'];
                     $item->save();
                 }
             }   
@@ -176,6 +178,8 @@ class ManageEquipmentController extends Controller
                     $item->serial_no = $list['serial_no'];
                     $item->sku = $list['sku'];
                     $item->supplier_id = $list['supplier'];
+                    $item->quantity = $list['quantity'];
+                    $item->unit_value = $list['unit_value'];
                     $item->save();
                 }
             }   
@@ -195,7 +199,7 @@ class ManageEquipmentController extends Controller
         // Perform delete
         if ($manageEquipment->delete()) {
             // return new ManageEquipmentResource($equipment);
-            return response(['success' => 'Property Acknowledgment Receipt removed'], Response::HTTP_ACCEPTED);
+            return response(['success' => 'Property Acknowledgment Receipt removed'], Response::HTTP_OK);
         }
 
     }

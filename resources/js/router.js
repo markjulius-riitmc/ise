@@ -1,12 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-
 Vue.use(VueRouter)
 
 import Home from './components/Home'
 import Page from './components/Page'
-import Category from './components/Category'
+import Category from './views/Category'
 import Equipment from './views/Equipment'
 import User from './views/User'
 import Site from './views/Site'
@@ -40,7 +39,7 @@ const routes = [
         path: '/category',
         name: 'category',
         component: Category,
-        props: { title: "Category Component" }
+        props: { title: "Category View" }
     },
     {
         path: '/equipment',

@@ -30,7 +30,7 @@ class ManageEquipment extends JsonResource
             'user_id' => User::findOrFail($this->user_id)->value('name'),
             'created_at' => $this->created_at->diffForHumans(),
             'attachments' => ManageEquipmentAttachment::where('manage_equipment_id', $this->id)->get(),
-            'items' => ManageEquipmentItem::where('manage_equipment_id', $this->id)->select('id', 'equipment_id as equipment', 'property_no', 'brand', 'model_no', 'serial_no', 'sku', 'supplier_id as supplier')->get(),
+            'items' => ManageEquipmentItem::where('manage_equipment_id', $this->id)->select('id', 'equipment_id as equipment', 'property_no', 'brand', 'model_no', 'serial_no', 'sku', 'supplier_id as supplier', 'quantity', 'unit_value')->get(),
         ];
     }
 }

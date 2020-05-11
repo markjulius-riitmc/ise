@@ -23,6 +23,8 @@ class CreateManageEquipmentItemsTable extends Migration
             $table->string('serial_no')->nullable();
             $table->string('sku')->nullable();
             $table->foreignId('supplier_id')->constrained('suppliers');
+            $table->double('quantity', 8, 2)->nullable();
+            $table->double('unit_value', 8, 2)->nullable();
             $table->timestamps();  
         });
     }

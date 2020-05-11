@@ -183,6 +183,22 @@
                                                                 :clearable="true"
                                                                 ></v-select>
                                                             </v-col>
+                                                            <v-col class="d-flex" cols="12" sm="12" md="12">
+                                                                <v-text-field
+                                                                v-model="editedItem.quantity"
+                                                                label="Quantity"
+                                                                value=""
+                                                                prefix="#"
+                                                                ></v-text-field>
+                                                            </v-col>
+                                                            <v-col class="d-flex" cols="12" sm="12" md="12">
+                                                                <v-text-field
+                                                                v-model="editedItem.unit_value"
+                                                                label="Unit Value"
+                                                                value=""
+                                                                prefix="$"
+                                                                ></v-text-field>
+                                                            </v-col>
                                                         </v-row>
                                                     </v-container>
                                                     <small>*indicates required field</small>
@@ -342,6 +358,8 @@
                     { text: 'Brand', value: 'brand' },
                     { text: 'Model No.', value: 'model_no' },
                     { text: 'Supplier', value: 'supplier' },
+                    { text: 'Quantity', value: 'quantity' },
+                    { text: 'Unit Value', value: 'unit_value' }, 
                     { text: 'Actions', value: 'actions', sortable: false },
                 ],
                 editedItem: {
@@ -353,6 +371,8 @@
                     brand: '',
                     model_no: '',
                     supplier: '',
+                    quantity: '',
+                    unit_value: '',
                 },
                 defaultItem: {
                     id: '',
@@ -363,6 +383,8 @@
                     brand: '',
                     model_no: '',
                     supplier: '',
+                    quantity: '',
+                    unit_value: '',
                 },
                 form: new FormData,
             }
@@ -493,32 +515,14 @@
                             'item_lists': this.item_lists,
                             'file_paths': this.file_paths,
                         }
-
                         // Update
                         axios.patch('/api/manage-equipment/'+this.id, equipment)
                         .then(response => {
-                            console.log(response)
                             alert(response.data.success)
                             this.clear()
                             this.fetchManageEquipment()
                         })
                         .catch(err => console.log(err))
-
-                        // fetch('/api/manage-equipment/'+this.id, {
-                        //     method: 'patch',
-                        //     body: this.form,
-                        //     headers: {
-                        //         // 'content-type': 'application/json'
-                        //         'Content-Type': 'multipart/form-data; boundary=something'
-                        //         //  'Content-Type': 'application/x-www-form-urlencoded' 
-                        //     },
-                        // })
-                        // .then(res => res.json())
-                        // .then(data => {
-                        //     alert('Property Acknowledgment Receipt updated')
-                        //     this.clear()
-                        //     this.fetchManageEquipment()
-                        // })
                     }
                     this.submitStatus = 'PENDING'
                     this.edit = false
@@ -545,7 +549,7 @@
                 this.division = ''
                 this.department = ''
                 this.employee = ''
-                // this.$refs.fileInput.value = ''
+                this.$refs.fileInput.value = ''
                 this.item_lists = []
             },
             editItem (item) {
@@ -584,13 +588,8 @@
                 this.item_lists = manage_equipment.items
                 this.file_paths = manage_equipment.attachments
                 // Assign attachment files to file input
-
-                // console.log(this.file_paths);
-                // console.log(this.item_lists);
             },
             deleteManageEquipment(id) {
-                console.log(id);
-                
                 if (confirm('Are you sure?')) {
                     fetch(`/api/manage-equipment/${id}`, {
                         method: 'delete'
@@ -604,7 +603,6 @@
                 }
             },
             fieldChange(event) {
-                console.log(event)
                 let selectedFiles = event
 
                 if (!selectedFiles.length) {

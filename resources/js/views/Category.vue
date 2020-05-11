@@ -30,6 +30,7 @@
                     @blur="$v.name.$touch()"
                     ref="name"
                     ></v-text-field>
+
                     <v-text-field
                     v-model="description"
                     :error-messages="descriptionErrors"
@@ -37,60 +38,53 @@
                     @input="$v.description.$touch()"
                     @blur="$v.description.$touch()"
                     ></v-text-field>
-                    <v-select
-                    :items="categories"
-                    label="Category"
-                    v-model="category"
-                    item-text="name"
-                    item-value="id"
-                    :clearable="true"
-                    ></v-select>
 
                     <v-btn class="mr-4" @click="submit">submit</v-btn>
                     <v-btn @click="clear">clear</v-btn>
                 </form>
-
-                <v-pagination
-                    v-model="pagination.current_page"
-                    :length="pagination.total"
-                    @input="changePage"
-                ></v-pagination>
-
-                <v-card
-                    class="mx-auto"
-                    outlined
-                    v-for="equipment in equipments"
-                    :key="equipment.id"
-                >
-                    <v-list-item three-line>
-                        <v-list-item-content>
-                            <div class="overline mb-4">OVERLINE</div>
-                            <v-list-item-title class="headline mb-1">{{ equipment.name }}</v-list-item-title>
-                            <v-list-item-subtitle>{{ equipment.description }}</v-list-item-subtitle>
-                            <v-list-item-subtitle>{{ equipment.category }}</v-list-item-subtitle>
-                        </v-list-item-content>
-                        <v-list-item-avatar
-                            tile
-                            size="80"
-                            color="grey"
-                        ></v-list-item-avatar>
-                    </v-list-item>
-                    <v-card-actions>
-                        <v-btn text @click="editEquipment(equipment)">Edit</v-btn>
-                        <v-btn text @click="deleteEquipment(equipment.id)">Delete</v-btn>
-                    </v-card-actions>
-                </v-card>
             </v-card-text>
+
+            <v-pagination
+                v-model="pagination.current_page"
+                :length="pagination.total"
+                @input="changePage"
+            ></v-pagination>
+
+            <v-card
+                class="mx-auto"
+                outlined
+                v-for="category in categories"
+                :key="category.id"
+            >
+                <v-list-item three-line>
+                    <v-list-item-content>
+                        <div class="overline mb-4">OVERLINE</div>
+                        <v-list-item-title class="headline mb-1">{{ category.name }}</v-list-item-title>
+                        <v-list-item-subtitle>{{ category.description }}</v-list-item-subtitle>
+                    </v-list-item-content>
+
+                    <v-list-item-avatar
+                        tile
+                        size="80"
+                        color="grey"
+                    ></v-list-item-avatar>
+                </v-list-item>
+
+                <v-card-actions>
+                    <v-btn text @click="editCategory(category)">Edit</v-btn>
+                    <v-btn text @click="deleteCategory(category.id)">Delete</v-btn>
+                </v-card-actions>
+            </v-card>
         </v-card>
     </div>
 </template>
-
+  
 <script>
     import { validationMixin } from 'vuelidate'
     import { required, maxLength, email } from 'vuelidate/lib/validators'
 
     export default {
-        props: ['title'],
+        props : ['title'],
         mixins: [validationMixin],
         validations: {
             name: { required, maxLength: maxLength(50) },
@@ -102,19 +96,16 @@
                 id: '',
                 name: '',
                 description: '',
-                category: '',
                 categories: [],
-                equipments: [],
-                equipment: {
+                category: {
                     id: '',
                     name: '',
                     description: '',
-                    category: '',
-                    equipment_id: '',
+                    category_id: '',
                 },
                 pagination: {},
                 meta: {},
-                edit: false,
+                edit:false,
                 submitStatus: null,
             }
         },
@@ -134,16 +125,15 @@
             },
         },
         created() {
-            this.fetchEquipments();
             this.fetchCategories();
         },
         methods: {
-            fetchEquipments(page) {
-                let  url = `/api/equipments?page=${page}`
+            fetchCategories(page) {
+                let url = `/api/categories?page=${page}`
                 fetch(url)
                 .then(res => res.json())
                 .then(res => {
-                    this.equipments = res.data;
+                    this.categories = res.data;
                     this.meta = res.meta
                     this.makePagination(res.meta, res.links);
                 })
@@ -166,56 +156,47 @@
                 }
                 return num
             },
-            fetchCategories() {
-                let url = '/api/categories'
-                fetch(url)
-                .then(res => res.json())
-                .then(res => {
-                    this.categories = res.data;
-                })
-                .catch(err => console.log(err));
-            },
             submit() {
                 this.$v.$touch()
 
                 if(this.$v.$invalid) {
                     this.submitStatus = 'ERROR'
                 } else {
-                    let equipment = {
+                    let category = {
                         id: this.id,
                         name: this.name,
                         description: this.description,
-                        category_id: this.category,
-                        equipment_id: this.id
+                        category_id: this.id
                     }
+
                     // Add
                     if (this.edit == false) {
-                        fetch('/api/equipment', {
+                        fetch('/api/category', {
                             method: 'post',
-                            body: JSON.stringify(equipment),
+                            body: JSON.stringify(category),
                             headers: {
                                 'content-type': 'application/json'
                             },
                         })
                         .then(res => res.json()
                         .then(data => {
-                            alert('Equipment added');
+                            alert('Category added');
                             this.clear()
-                            this.fetchEquipments();
+                            this.fetchCategories();
                         }))
                     } else { // Update
-                        fetch('/api/equipment', {
+                        fetch('/api/category', {
                             method: 'put',
-                            body: JSON.stringify(equipment),
+                            body: JSON.stringify(category),
                             headers: {
                                 'content-type': 'application/json'
                             },
                         })
                         .then(res => res.json())
                         .then(data => {
-                            alert('Equipment updated')
+                            alert('Category updated')
                             this.clear()
-                            this.fetchEquipments();
+                            this.fetchCategories();
                         })
                     }
                     this.submitStatus = 'PENDING'
@@ -230,37 +211,36 @@
                 this.id = ''
                 this.name = ''
                 this.description = ''
-                this.category = ''
-                this.equipment_id = ''
+                this.category_id = ''
             },
-            editEquipment(equipment) {
+            editCategory(category) {
                 this.edit = true;
-                this.id = equipment.id;
-                this.name = equipment.name;
-                this.description = equipment.description;
-                this.category = equipment.category_id;
-                this.equipment_id = equipment.id;
+                this.id = category.id;
+                this.name = category.name;
+                this.description = category.description;
+                this.category_id = category.id;
             },
-            deleteEquipment(id) {
+            deleteCategory(id) {
                 if (confirm('Are you sure?')) {
-                    fetch(`/api/equipment/${id}`, {
-                        method: 'delete'
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        alert('Equipment removed');
-                        this.fetchEquipments();
-                    })
-                    .catch(err => console.log(err));
+                fetch(`/api/category/${id}`, {
+                    method: 'delete'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert('Category removed');
+                    this.fetchCategories();
+                })
+                .catch(err => console.log(err));
                 }
             },
             changePage(page) {
-                this.fetchEquipments(page)
+                this.fetchCategories(page)
             },
-        },
+        }
     }
 </script>
 
-<style lang="scss" scoped>
+<!-- Styles -->
+<style scoped>
 
 </style>

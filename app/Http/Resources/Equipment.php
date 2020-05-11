@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Category;
 
 class Equipment extends JsonResource
 {
@@ -20,7 +21,8 @@ class Equipment extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'category_id' => $this->category_id
+            'category_id' => $this->category_id,
+            'category' => Category::where('id', $this->category_id)->value('name'),
         ];
     }
 }
