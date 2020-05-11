@@ -14,6 +14,7 @@ import Department from './views/Department'
 import Employee from './views/Employee'
 import Supplier from './views/Supplier'
 import ManageEquipment from './views/ManageEquipment'
+import Login from './views/Login'
 
 const routes = [
     {
@@ -81,11 +82,15 @@ const routes = [
         component: ManageEquipment,
         props: {title: "Manage Equipment View"}
     },
+    {
+        path: '/login',
+        component: Login,
+    },
     
 ]
 
 export default new VueRouter({
     routes,
-    // hashbang: false,
-    // mode: 'history'
+    hashbang: false,
+    mode: 'history'
 })
