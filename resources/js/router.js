@@ -15,6 +15,8 @@ import Employee from './views/Employee'
 import Supplier from './views/Supplier'
 import ManageEquipment from './views/ManageEquipment'
 import Login from './views/Login'
+import Signup from './views/Signup'
+import Logout from './components/Logout'
 
 const routes = [
     {
@@ -85,6 +87,14 @@ const routes = [
     {
         path: '/login',
         component: Login,
+    },
+    {
+        path: '/signup',
+        component: Signup,
+    },
+    {
+        path: '/logout',
+        component: Logout
     },
     
 ]

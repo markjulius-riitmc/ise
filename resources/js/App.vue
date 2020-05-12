@@ -5,7 +5,24 @@
       app
     >
       <v-list dense>
-        <v-list-item to="/" link>
+
+        <router-link v-for="item in items"
+          :key="item.title"
+          :to="item.to"
+          v-if="item.show">
+          <v-list-item
+          link>
+            <v-list-item-action>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+        
+
+        <!-- <v-list-item to="/" link>
           <v-list-item-action>
             <v-icon>mdi-home</v-icon>
           </v-list-item-action>
@@ -111,7 +128,7 @@
           <v-list-item-content>
             <v-list-item-title>Login</v-list-item-title>
           </v-list-item-content>
-        </v-list-item>
+        </v-list-item> -->
       </v-list>
     </v-navigation-drawer>
 
@@ -152,17 +169,26 @@
     },
     data: () => ({
       drawer: null,
-      admins: [
-        ['Management', 'people_outline'],
-        ['Settings', 'settings'],
-      ],
-      cruds: [
-        ['Create', 'add'],
-        ['Read', 'insert_drive_file'],
-        ['Update', 'update'],
-        ['Delete', 'delete'],
+      items: [
+        { icon: 'mdi-home', title: 'Home', to:'/', show: true },
+        { icon: 'mdi-shape', title: 'Category', to:'/category', show: User.loggedIn() },
+        { icon: 'mdi-tools', title: 'Equipment', to:'/equipment', show: User.loggedIn() },
+        { icon: 'mdi-account', title: 'User', to:'/user', show: User.loggedIn() },
+        { icon: 'mdi-map-marker', title: 'Site', to:'/site', show: User.loggedIn() },
+        { icon: 'mdi-select-group', title: 'Division', to:'/division', show: User.loggedIn() },
+        { icon: 'mdi-domain', title: 'Department', to:'/department', show: User.loggedIn() },
+        { icon: 'mdi-account-group', title: 'Employee', to:'/employee', show: User.loggedIn() },
+        { icon: 'mdi-semantic-web', title: 'Supplier', to:'/supplier', show: User.loggedIn() },
+        { icon: 'mdi-calendar-text', title: 'Manage Equipment', to:'/manage-equipment', show: User.loggedIn() },
+        { icon: 'mdi-login', title: 'Login', to:'/login', show: !User.loggedIn() },
+        { icon: 'mdi-logout', title: 'Logout', to:'/logout', show: User.loggedIn() },
       ],
     }),
+    created() {
+      EventBus.$on('logout', () => {
+        User.logout()
+      })
+    },
   }
 </script>
 

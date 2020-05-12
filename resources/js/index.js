@@ -9,6 +9,8 @@ import App from './App.vue'
 import User from './helpers/User'
 window.User = User
 
+window.EventBus = new Vue()
+
 const app = new Vue({
     el: '#app',
     vuetify,

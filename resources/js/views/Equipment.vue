@@ -18,7 +18,7 @@
             :sticky="sticky"
             >
             </v-banner>
-            <v-card-text class="grey lighten-4">
+            <v-card-text class="gray lighten-4">
                 <form>        
                     <v-text-field
                     v-model="name"
