@@ -22,7 +22,7 @@
             >
             </v-banner>
             
-            <v-card-text class="grey lighten-4">
+            <v-card-text class="gray lighten-4">
                 <v-form>   
                     <v-row>
                         <v-col class="d-flex" cols="12" sm="4">

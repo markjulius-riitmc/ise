@@ -96,7 +96,6 @@ const routes = [
         path: '/logout',
         component: Logout
     },
-    
 ]
 
 export default new VueRouter({

@@ -44907,7 +44907,7 @@ var render = function() {
           _vm._v(" "),
           _c(
             "v-card-text",
-            { staticClass: "grey lighten-4" },
+            { staticClass: "gray lighten-4" },
             [
               _c(
                 "v-form",
@@ -104785,7 +104785,7 @@ var Token = /*#__PURE__*/function () {
       var payload = this.payload(token);
 
       if (payload) {
-        return payload.iss == "http://ise.test/api/auth/login" || "http://ise.test/api/auth/signup" ? true : false;
+        return payload.iss == "http://localhost/api/auth/login" || "http://localhost/api/auth/signup" ? true : false;
       }
 
       return false;
