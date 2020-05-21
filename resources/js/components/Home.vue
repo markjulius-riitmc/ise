@@ -17,9 +17,9 @@
         single-line
         :sticky="sticky"
         >
-
-            Welcome to {{ title }}
-
+            <!-- Welcome to {{ title }} -->
+            <p class="font-weight-bold">{{ inspire }}</p>
+          
             <template v-slot:actions>
                 <v-btn
                 text
@@ -43,7 +43,13 @@
         props : ['title'],
         data: () =>({
             sticky: false,
+            inspire: null,
         }),
+        created() {
+            axios.get('/api/get-inspiration')
+                .then(res => this.inspire = res.data.inspire)
+                .catch(err => console.log(err))
+        },
     }
 </script>
 

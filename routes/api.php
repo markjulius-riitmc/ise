@@ -94,3 +94,6 @@ Route::group([
 
 });
 
+
+
+Route::get('/get-inspiration', 'HomeController@getInspiration');

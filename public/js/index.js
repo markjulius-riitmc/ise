@@ -2204,8 +2204,18 @@ __webpack_require__.r(__webpack_exports__);
   props: ['title'],
   data: function data() {
     return {
-      sticky: false
+      sticky: false,
+      inspire: null
     };
+  },
+  created: function created() {
+    var _this = this;
+
+    axios.get('/api/get-inspiration').then(function (res) {
+      return _this.inspire = res.data.inspire;
+    })["catch"](function (err) {
+      return console.log(err);
+    });
   }
 });
 
@@ -43455,11 +43465,9 @@ var render = function() {
               ])
             },
             [
-              _vm._v(
-                "\n\n          Welcome to " +
-                  _vm._s(_vm.title) +
-                  "\n\n          "
-              )
+              _c("p", { staticClass: "font-weight-bold" }, [
+                _vm._v(_vm._s(_vm.inspire))
+              ])
             ]
           ),
           _vm._v(" "),
