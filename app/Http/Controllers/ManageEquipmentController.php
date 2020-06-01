@@ -40,6 +40,7 @@ class ManageEquipmentController extends Controller
         // Get manage equipment and method
         $equipment = new ManageEquipment;
         // Initialize fields
+        $equipment->par_date = $request->par_date;
         $equipment->par_no = $request->par_no;
         $equipment->description = $request->description;
         $equipment->site_id = $request->site;
@@ -132,6 +133,7 @@ class ManageEquipmentController extends Controller
         // dd($request->site);
 
         // Assign values
+        $manageEquipment->par_date = $request->par_date;
         $manageEquipment->par_no = $request->par_no;
         $manageEquipment->description = $request->description;
         $manageEquipment->site_id = $request->site;

@@ -15,6 +15,7 @@ class CreateManageEquipmentTable extends Migration
     {
         Schema::create('manage_equipment', function (Blueprint $table) {
             $table->id();
+            $table->date('par_date')->nullable();
             $table->string('par_no')->nullable();
             $table->string('fund_cluster')->nullable();
             $table->string('description')->nullable();

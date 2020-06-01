@@ -25,7 +25,31 @@
             <v-card-text class="gray lighten-4">
                 <v-form>   
                     <v-row>
-                        <v-col class="d-flex" cols="12" sm="4">
+                        <v-col class="d-flex" cols="12" sm="2">
+                            <v-menu
+                            ref="menu1"
+                            v-model="menu1"
+                            :close-on-content-click="false"
+                            transition="scale-transition"
+                            offset-y
+                            max-width="290px"
+                            min-width="290px"
+                            >
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field
+                                    v-model="par_date"
+                                    label="PAR Date"
+                                    hint="MM/DD/YYYY"
+                                    persistent-hint
+                                    prepend-icon="mdi-calendar"
+                                    @blur="date = parseDate(par_date)"
+                                    v-on="on"
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker v-model="date" no-title @input="menu1 = false"></v-date-picker>
+                            </v-menu>
+                        </v-col>
+                        <v-col class="d-flex" cols="12" sm="2">
                             <v-text-field
                             v-model="par_no"
                             :error-messages="parNoErrors"
@@ -123,16 +147,6 @@
                                                 <v-card-text>
                                                     <v-container>
                                                         <v-row>
-                                                            <!-- <v-col class="d-flex" cols="12" sm="12" md="4">
-                                                                <v-avatar
-                                                                    class="profile"
-                                                                    color="blue-grey"
-                                                                    size="164"
-                                                                    tile
-                                                                >
-                                                                    <v-img src="https://cdn.vuetifyjs.com/images/profiles/marcus.jpg"></v-img>
-                                                                </v-avatar>
-                                                            </v-col> -->
                                                             <v-col class="d-flex" cols="12"> 
                                                                 <v-text-field
                                                                 v-model="editedItem.property_no"
@@ -236,7 +250,6 @@
                     </v-row>
                     <v-btn class="mr-4" @click="submit">submit</v-btn>
                     <v-btn @click="clear">clear</v-btn>
-                    
                 </v-form>
             </v-card-text>
 
@@ -286,24 +299,6 @@
             par_no: { required, maxLength: maxLength(255) },
             description: { maxLength: maxLength(255) },
         },
-        computed: {
-            parNoErrors () {
-                const errors = []
-                if (!this.$v.par_no.$dirty) return errors
-                !this.$v.par_no.required && errors.push('PAR No. is required.')
-                !this.$v.par_no.maxLength && errors.push('PAR No. must be at most 255 characters long')
-                return errors
-            },
-            descriptionErrors () {
-                const errors = []
-                if (!this.$v.description.$dirty) return errors
-                !this.$v.description.maxLength && errors.push('Description must be at most 255 characters long')
-                return errors
-            },
-            formTitle () {
-                return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
-            },
-        },
         data() {
             return {
                 sticky: false,
@@ -314,6 +309,7 @@
                 dialog: false,
                 editedIndex: -1,
                 id: '',
+                par_date: this.formatDate(new Date().toISOString().substr(0, 10)),
                 par_no: '',
                 description: '',
                 site: '',
@@ -323,6 +319,7 @@
                 fileInput: '',
                 equipment: {
                     id: '',
+                    par_date: '',
                     par_no: '',
                     description: '',
                     site: '',
@@ -387,7 +384,35 @@
                     unit_value: '',
                 },
                 form: new FormData,
+                date: new Date().toISOString().substr(0, 10), 
+                menu1: false,
             }
+        },
+        computed: {
+            parNoErrors () {
+                const errors = []
+                if (!this.$v.par_no.$dirty) return errors
+                !this.$v.par_no.required && errors.push('PAR No. is required.')
+                !this.$v.par_no.maxLength && errors.push('PAR No. must be at most 255 characters long')
+                return errors
+            },
+            descriptionErrors () {
+                const errors = []
+                if (!this.$v.description.$dirty) return errors
+                !this.$v.description.maxLength && errors.push('Description must be at most 255 characters long')
+                return errors
+            },
+            formTitle () {
+                return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+            },
+        },
+        watch: {
+            dialog (val) {
+                val || this.close()
+            },
+            date (val) {
+                this.par_date = this.formatDate(this.date)
+            },
         },
         created() {
             this.initialize()
@@ -474,13 +499,12 @@
             },
             submit() {
                 const config = { headers: { 'Content-Type': 'multipart/form-data' } }
-
                 this.$v.$touch()
-
                 if(this.$v.$invalid) {
                     this.submitStatus = 'ERROR'
                 } else {
                     this.form.append('id', this.id)
+                    this.form.append('par_date', this.parseDate(this.par_date))
                     this.form.append('par_no', this.par_no)
                     this.form.append('description', this.description)
                     this.form.append('site', this.site)
@@ -492,6 +516,8 @@
                     for (let i = 0; i < this.file_paths.length; i++) {
                         this.form.append('file_paths[]', this.file_paths[i])
                     }
+
+                    console.log(this.form)
 
                     if (this.edit == false) {
                         // Add
@@ -506,6 +532,7 @@
                     } else {
                         let equipment = {
                             'id': this.id,
+                            'par_date': this.parseDate(this.par_date),
                             'par_no': this.par_no,
                             'description': this.description,
                             'site': this.site,
@@ -515,6 +542,8 @@
                             'item_lists': this.item_lists,
                             'file_paths': this.file_paths,
                         }
+
+                        console.log(equipment)
                         // Update
                         axios.patch('/api/manage-equipment/'+this.id, equipment)
                         .then(response => {
@@ -543,6 +572,7 @@
             clear() {
                 this.$v.$reset()
                 this.id = ''
+                this.par_date = this.formatDate(new Date().toISOString().substr(0, 10)),
                 this.par_no = ''
                 this.description = ''
                 this.site = ''
@@ -564,8 +594,8 @@
             close () {
                 this.dialog = false
                 setTimeout(() => {
-                this.editedItem = Object.assign({}, this.defaultItem)
-                this.editedIndex = -1
+                    this.editedItem = Object.assign({}, this.defaultItem)
+                    this.editedIndex = -1
                 }, 300)
             },
             save () {
@@ -579,6 +609,7 @@
             editManageEquipment(manage_equipment) {
                 this.edit = true
                 this.id = manage_equipment.id
+                this.par_date = this.formatDate(manage_equipment.par_date)
                 this.par_no = manage_equipment.par_no
                 this.description = manage_equipment.description
                 this.site = manage_equipment.site_id
@@ -604,7 +635,7 @@
             },
             fieldChange(event) {
                 let selectedFiles = event
-
+                
                 if (!selectedFiles.length) {
                     return false
                 }
@@ -612,10 +643,17 @@
                     this.file_paths.push(selectedFiles[i])
                 }
             },
-        },
-        watch: {
-            dialog (val) {
-                val || this.close()
+            formatDate (date) {
+                if (!date) return null
+
+                const [year, month, day] = date.split('-')
+                return `${month}/${day}/${year}`
+            },
+            parseDate (date) {
+                if (!date) return null
+
+                const [month, day, year] = date.split('/')
+                return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
             },
         },
     }

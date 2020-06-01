@@ -21,6 +21,7 @@ class ManageEquipment extends JsonResource
 
         return [
             'id' => $this->id,
+            'par_date' => $this->par_date,
             'par_no' => $this->par_no,
             'description' => $this->description,
             'site_id' => $this->site_id,
