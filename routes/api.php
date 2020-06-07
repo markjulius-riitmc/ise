@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 Route::resource('/cruds', 'CrudsController', [
   'except' => ['edit', 'show', 'store']
@@ -78,6 +78,7 @@ Route::delete('/supplier/{id}', 'SupplierController@destroy');
 // Route::put('/manage-equipment', 'ManageEquipmentController@store');
 // Route::delete('/manage-equipment/{id}', 'ManageEquipmentController@destroy');
 Route::apiResource('manage-equipment', 'ManageEquipmentController');
+Route::apiResource('user', 'UserController');
 
 Route::group([
 

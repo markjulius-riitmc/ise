@@ -52,7 +52,7 @@ const routes = [
     {
         path: '/user',
         component: User,
-        props: {title: "User view (ongoing)"}
+        props: {title: "User view"}
     },
     {
         path: '/site',
