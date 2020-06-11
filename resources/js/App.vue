@@ -181,7 +181,7 @@
         { icon: 'mdi-semantic-web', title: 'Supplier', to:'/supplier', show: User.loggedIn() },
         { icon: 'mdi-calendar-text', title: 'Manage Equipment', to:'/manage-equipment', show: User.loggedIn() },
         { icon: 'mdi-login', title: 'Login', to:'/login', show: !User.loggedIn() },
-        { icon: 'mdi-logout', title: 'Logout', to:'/logout', show: User.loggedIn() },
+        { icon: 'mdi-logout', title: 'Logout', to:'/logout', show: User.loggedIn() }
       ],
     }),
     created() {

@@ -22,7 +22,7 @@
                 <form>        
                     <v-text-field
                     v-model="name"
-                    :error-messages="nameErrors"
+     
                     :counter="50"
                     label="Name"
                     required
@@ -33,27 +33,27 @@
 
                     <v-text-field
                     v-model="description"
-                    :error-messages="descriptionErrors"
+               
                     label="Description"
                     @input="$v.description.$touch()"
                     @blur="$v.description.$touch()"
                     ></v-text-field>
 
-                    <v-btn class="mr-4" @click="submit">submit</v-btn>
-                    <v-btn @click="clear">clear</v-btn>
+                    <v-btn class="mr-4" @click="onSubmit">submit</v-btn>
+                    <!-- <v-btn @click="clear">clear</v-btn> -->
                 </form>
             </v-card-text>
 
-            <v-pagination
+            <!-- <v-pagination
                 v-model="pagination.current_page"
                 :length="pagination.total"
                 @input="changePage"
-            ></v-pagination>
+            ></v-pagination> -->
 
             <v-card
                 class="mx-auto"
                 outlined
-                v-for="category in categories"
+                v-for="category in allCategories"
                 :key="category.id"
             >
                 <v-list-item three-line>
@@ -80,8 +80,9 @@
 </template>
   
 <script>
+    import { mapGetters, mapActions } from 'vuex';
     import { validationMixin } from 'vuelidate'
-    import { required, maxLength, email } from 'vuelidate/lib/validators'
+    import { required, maxLength } from 'vuelidate/lib/validators'
 
     export default {
         props : ['title'],
@@ -93,150 +94,122 @@
         data() {
             return {
                 sticky: false,
-                id: '',
+                // id: '',
                 name: '',
                 description: '',
-                categories: [],
-                category: {
-                    id: '',
-                    name: '',
-                    description: '',
-                    category_id: '',
-                },
-                pagination: {},
-                meta: {},
-                edit:false,
-                submitStatus: null,
+                // pagination: {},
+                // meta: {},
+                // edit:false,
+                // submitStatus: null,
             }
         },
-        computed: {
-            nameErrors () {
-                const errors = []
-                if (!this.$v.name.$dirty) return errors
-                !this.$v.name.maxLength && errors.push('Name must be at most 50 characters long')
-                !this.$v.name.required && errors.push('Name is required.')
-                return errors
-            },
-            descriptionErrors () {
-                const errors = []
-                if (!this.$v.description.$dirty) return errors
-                !this.$v.description.maxLength && errors.push('Must be at most 255 characters long')
-                return errors
-            },
-        },
-        created() {
-            this.fetchCategories();
-        },
         methods: {
-            fetchCategories(page) {
-                let url = `/api/categories?page=${page}`
-                fetch(url)
-                .then(res => res.json())
-                .then(res => {
-                    this.categories = res.data;
-                    this.meta = res.meta
-                    this.makePagination(res.meta, res.links);
-                })
-                .catch(err => console.log(err));
-            },
-            makePagination(meta, links) {
-                let pagination = {
-                    current_page: meta.current_page,
-                    total: this.makeAbsNumber(meta.total/meta.per_page),
-                }
-                this.pagination = pagination;
-            },
-            makeAbsNumber(num) {
-                let mod = (num % 1)
-                if (mod < 0.5 && num > 0) {
-                    num -= mod
-                    num += 1
-                } else {
-                    num = Math.round(num)
-                }
-                return num
-            },
-            submit() {
-                this.$v.$touch()
+            ...mapActions(['fetchCategories', 'addCategory']),
+            onSubmit() {
+                // this.$v.$touch()
 
-                if(this.$v.$invalid) {
-                    this.submitStatus = 'ERROR'
-                } else {
+                // if(this.$v.$invalid) {
+                //     this.submitStatus = 'ERROR'
+                // } else {
+
                     let category = {
-                        id: this.id,
                         name: this.name,
-                        description: this.description,
-                        category_id: this.id
+                        description: this.description
                     }
-
                     // Add
-                    if (this.edit == false) {
-                        fetch('/api/category', {
-                            method: 'post',
-                            body: JSON.stringify(category),
-                            headers: {
-                                'content-type': 'application/json'
-                            },
-                        })
-                        .then(res => res.json()
-                        .then(data => {
-                            alert('Category added');
-                            this.clear()
-                            this.fetchCategories();
-                        }))
-                    } else { // Update
-                        fetch('/api/category', {
-                            method: 'put',
-                            body: JSON.stringify(category),
-                            headers: {
-                                'content-type': 'application/json'
-                            },
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            alert('Category updated')
-                            this.clear()
-                            this.fetchCategories();
-                        })
-                    }
-                    this.submitStatus = 'PENDING'
-                    this.edit = false
-                    setTimeout(() => {
-                        this.submitStatus = 'OK'
-                    }, 500)
-                }
+                    // if (this.edit == false) {
+                        this.addCategory(category);
+                        // fetch('/api/category', {
+                        //     method: 'post',
+                        //     body: JSON.stringify(category),
+                        //     headers: {
+                        //     'content-type': 'application/json'
+                        //     },
+                        // })
+                        // .then(res => res.json()
+                        // .then(data => {
+                        //     alert('Category added');
+                        //     this.clear()
+                        //     this.fetchCategories();
+                        // }))
+                    // } else { // Update
+                        // fetch('/api/category', {
+                        //     method: 'put',
+                        //     body: JSON.stringify(category),
+                        //     headers: {
+                        //         'content-type': 'application/json'
+                        //     },
+                        // })
+                        // .then(res => res.json())
+                        // .then(data => {
+                        //     alert('Category updated')
+                        //     this.clear()
+                        //     this.fetchCategories();
+                        // })
+                    // }
+                    // this.submitStatus = 'PENDING'
+                    // this.edit = false
+                    // setTimeout(() => {
+                    //     this.submitStatus = 'OK'
+                    // }, 500)
+                // }
             },
-            clear() {
-                this.$v.$reset()
-                this.id = ''
-                this.name = ''
-                this.description = ''
-                this.category_id = ''
-            },
-            editCategory(category) {
-                this.edit = true;
-                this.id = category.id;
-                this.name = category.name;
-                this.description = category.description;
-                this.category_id = category.id;
-            },
-            deleteCategory(id) {
-                if (confirm('Are you sure?')) {
-                fetch(`/api/category/${id}`, {
-                    method: 'delete'
-                })
-                .then(res => res.json())
-                .then(data => {
-                    alert('Category removed');
-                    this.fetchCategories();
-                })
-                .catch(err => console.log(err));
-                }
-            },
-            changePage(page) {
-                this.fetchCategories(page)
-            },
-        }
+            // clear() {
+            //     this.$v.$reset()
+            //     this.id = ''
+            //     this.name = ''
+            //     this.description = ''
+            //     this.category_id = ''
+            // },
+            // editCategory(category) {
+            //     this.edit = true;
+            //     this.id = category.id;
+            //     this.name = category.name;
+            //     this.description = category.description;
+            //     this.category_id = category.id;
+            // },
+            // deleteCategory(id) {
+            //     if (confirm('Are you sure?')) {
+            //     fetch(`/api/category/${id}`, {
+            //         method: 'delete'
+            //     })
+            //     .then(res => res.json())
+            //     .then(data => {
+            //         alert('Category removed');
+            //         // this.fetchCategories();
+            //     })
+            //     .catch(err => console.log(err));
+            //     }
+            // },
+            // changePage(page) {
+            //     // this.$store.dispatch('fetchCategories', page)
+            // },
+        },
+        // computed: {
+        //     nameErrors () {
+        //         const errors = []
+        //         if (!this.$v.name.$dirty) return errors
+        //         !this.$v.name.maxLength && errors.push('Name must be at most 50 characters long')
+        //         !this.$v.name.required && errors.push('Name is required.')
+        //         return errors
+        //     },
+        //     descriptionErrors () {
+        //         const errors = []
+        //         if (!this.$v.description.$dirty) return errors
+        //         !this.$v.description.maxLength && errors.push('Must be at most 255 characters long')
+        //         return errors
+        //     },
+        //     categories () {
+        //         return this.$store.state.categories
+        //     },
+            
+        // },
+        computed: mapGetters(['allCategories']),
+        created() {
+            // this.$store.dispatch('fetchCategories')
+            this.fetchCategories()
+        },
+        
     }
 </script>
 

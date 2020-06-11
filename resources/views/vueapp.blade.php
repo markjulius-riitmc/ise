@@ -21,7 +21,6 @@
   </head>
   <body>
       <div id="app">
-        <app></app>
       </div>
       
       <script type="text/javascript" src="js/index.js"></script>

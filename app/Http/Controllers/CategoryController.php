@@ -29,6 +29,7 @@ class CategoryController extends Controller
     {
         // Get categories
         $categories = Category::orderBy('created_at', 'desc')->paginate(5);
+        // $categories = Category::orderBy('created_at', 'desc')->get();
 
         // Return collection of categories as a resource
         return CategoryResource::collection($categories);
